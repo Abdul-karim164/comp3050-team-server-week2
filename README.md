@@ -45,7 +45,7 @@ This endpoint returns a JSON object containing Olympic medal statistics for a co
 Team Members and Roles
    Name	              Role	                     Responsibilities
 Arindam Biswas |	  GITHUB DOCUMENTATION |   ADD UPDATE README FILE ACCORDING TO THE PROGRESS AND CURRENT STATE OF PROJECT
-Team Member 2  |                         |  
+Shoa Akiyama   |                         |  
 Team Member 3	 |                         |  
 Team member 4  |                         |
 team member 5  |                         |
