@@ -20,8 +20,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Compile Java files
-        run: javac *.java
+      - name: Build and test with Maven
+        run: mvn test
 
       - name: Build Docker image
         run: docker build . --file Dockerfile --tag team-server:latest
