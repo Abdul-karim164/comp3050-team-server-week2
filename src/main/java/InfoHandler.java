@@ -1,0 +1,73 @@
+import java.io.IOException;
+import java.io.OutputStream;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+public class InfoHandler implements HttpHandler {
+
+    @Override
+    public void handle(HttpExchange he) throws IOException {
+        he.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        he.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, OPTIONS");
+
+        if ("OPTIONS".equals(he.getRequestMethod())) {
+            he.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        String query = he.getRequestURI().getQuery();
+        int y = -1;
+        int x = -1;
+
+        if (query != null) {
+            for (String param : query.split("&")) {
+                String[] pair = param.split("=");
+                if (pair.length == 2) {
+                    try {
+                        if (pair[0].equals("y")) y = Integer.parseInt(pair[1]);
+                        else if (pair[0].equals("x")) x = Integer.parseInt(pair[1]);
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        }
+
+        // Return 204 if requested location doesn't match current player position
+        if (y != Test.playerY || x != Test.playerX) {
+            he.sendResponseHeaders(204, -1);
+            he.close();
+            return;
+        }
+
+        int top    = Test.playerY - 5;
+        int left   = Test.playerX - 5;
+        int bottom = Test.playerY + 5;
+        int right  = Test.playerX + 5;
+
+        // Build 11x11 info array centred on player
+        StringBuilder info = new StringBuilder("[");
+        for (int row = top; row <= bottom; row++) {
+            if (row > top) info.append(",");
+            info.append("[");
+            for (int col = left; col <= right; col++) {
+                if (col > left) info.append(",");
+                String tile = GameMap.isInBounds(row, col)
+                        ? String.valueOf(GameMap.getTile(row, col))
+                        : "g";
+                info.append("\"").append(tile).append("\"");
+            }
+            info.append("]");
+        }
+        info.append("]");
+
+        String response = String.format(
+            "{\"y\":%d,\"x\":%d,\"top\":%d,\"left\":%d,\"bottom\":%d,\"right\":%d,\"info\":%s}",
+            Test.playerY, Test.playerX, top, left, bottom, right, info
+        );
+
+        he.getResponseHeaders().set("Content-Type", "application/json");
+        he.sendResponseHeaders(200, response.getBytes().length);
+        OutputStream os = he.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
+    }
+}

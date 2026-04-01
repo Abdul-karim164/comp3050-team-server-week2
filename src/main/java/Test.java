@@ -13,8 +13,8 @@ public class Test {
         server.createContext("/test", new MyHandler());
         server.createContext("/hello", new HelloHandler());
         
-        // Added MoveHandler for player movement
         server.createContext("/move", new MoveHandler());
+        server.createContext("/info", new InfoHandler());
 
         server.setExecutor(null); 
         server.start();
